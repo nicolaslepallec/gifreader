@@ -1,0 +1,132 @@
+<html>
+<head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <!-- <meta name="viewport" content="user-scalable=no, width=device-width" /> -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <title>gifReader</title>
+   
+    <style>
+    </style>
+    <script type="text/javascript">
+    var APIURL="/";
+    var refreshTime=5000;
+    var images =[];
+    var started=false;
+    json={"gifsURL":["https://31.media.tumblr.com/462e7c9812d634df1167f6ed48a743c4/tumblr_mxy4htFSHR1sa2zw8o2_250.gif","https://31.media.tumblr.com/93e0a64d546fc6ec9ad1368feea7928a/tumblr_inline_mxy6jrCkLG1rj7poc.gif","http://data2.whicdn.com/images/83852004/large.gif","https://31.media.tumblr.com/bbc001a1a7bdc16ce8fa7620f00e4b54/tumblr_mxr506AzDS1rl58vno2_250.gif","http://i.imgur.com/58PmIN8.gif","https://24.media.tumblr.com/6fa5fb45ff74d80b6428a344f8967145/tumblr_mfe4o6xBBa1rdwuuio1_500.gif","https://24.media.tumblr.com/e40cafab8452a19fa97e3a2191072437/tumblr_mxkhh35bBR1sxg9q8o1_500.gif","https://31.media.tumblr.com/a9980b3f91a85d19a431b3593315911b/tumblr_mx9wy8Y1ap1rmjat4o1_500.gif","http://31.media.tumblr.com/0b4594725face2eb3dcb4bd1f49b0534/tumblr_mr1q8wY7zl1qkxasoo4_250.gif","http://ww2.sinaimg.cn/large/4ebdc904tw1ebmp98lmukg206o03q1kx.gif","https://24.media.tumblr.com/447fe79994b300d32bdb068cf21cbf62/tumblr_mxxef6Zzge1smuhk7o1_500.gif","https://24.media.tumblr.com/a9e7e4628d78d45f3c0c12919c5c9a70/tumblr_mxwzny3cSi1sm5s4ko2_250.gif","http://images4.wikia.nocookie.net/glee/images/b/b2/You-want-some-of-this-cow.gif"]};
+
+
+     window.onload=function(){
+        document.getElementById("gifHolder").src=json.gifsURL[0];
+        console.log(json.gifsURL[0]);
+        refreshStream();
+     };
+var id=0;
+
+    function imageonload(){
+        console.log("imageOnLoad");
+        $(window).height();
+        $(window).width();
+        var ratio = $(window).height()/$(window).width();
+      
+
+        // Get on screen image
+        var screenImage = $("#image");
+
+        // Create new offscreen image to test
+        var theImage = new Image();
+        theImage.src = screenImage.attr("src");
+
+        // Get accurate measurements from that.
+        var imageWidth = theImage.width;
+        var imageHeight = theImage.height;
+
+        var imgRatio=imageHeight/imageWidth;
+        if(ratio>imgRatio){
+            //$("#gifHolder").css("max-height", "100%");
+            $("#gifHolder").css("min-width", "100%");
+            $("#gifHolder").css("min-height", "auto");
+        }else{
+            $("#gifHolder").css("min-height", "100%");
+            $("#gifHolder").css("min-width", "auto");
+            //$("#gifHolder").css("max-width", "100%");
+        }
+
+        $("#gifHolder").select();
+        $("#gifHolder").visible=true;
+     }
+
+     function next(){
+        id++;
+        id%=json.gifsURL.length;
+        
+        document.getElementById("gifHolder").src=json.gifsURL[id];
+        document.getElementById("gifHolder").onload = function(){imageonload();};
+        var timer=setTimeout("next()", refreshTime);
+     }
+
+     function refreshStream(){
+                console.log("refreshStream");
+                $.getJSON( APIURL, function( data ) {
+                json=data;
+                preload(json.gifsURL);
+                var timer2=setTimeout("refreshStream()", (json.gifsURL.length*refreshTime)-refreshTime/2);
+                if(!started){
+                   var timer=setTimeout("next()", refreshTime);
+                   started=true;
+                }
+        });
+     }
+
+     
+
+     function preload(imagesURL){
+
+        for (i = 0; i < imagesURL.length; i++) {
+            if(!(images[i] instanceof Image)){
+                  images[i] = new Image()
+            }
+            images[i].src = imagesURL[i];
+        }
+            
+     }
+
+
+    </script>
+    <style type="text/css">
+        html, body {
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  background-color: 0;
+}
+
+#gifHolder {
+  
+  bottom: 0;
+    left: 0;
+    margin: auto;
+    overflow: auto;
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+
+#wrapper {
+  position: relative;
+  width: 800px;
+  min-height: 400px;
+  margin: 100px auto;
+  color: #333;
+}
+    </style>
+</head>
+<body>
+     <img id="gifHolder" src=""/>
+    <div id ="wrapper">
+       
+    </div>
+</body>
+</html>
